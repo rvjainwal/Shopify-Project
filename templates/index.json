@@ -20,7 +20,9 @@
             "title": "FIT BHI. FAB BHI. FINALLY.",
             "subtitle": "Plus-size streetwear essentials in 2XL-6XL.",
             "button_label": "SHOP NOW",
-            "button_link": "shopify://collections/all"
+            "button_link": "shopify://collections/all",
+            "desktop_fallback_asset": "marcabold-hero.png",
+            "mobile_fallback_asset": "marcabold-hero.png"
           }
         },
         "slide_hero_secondary": {
@@ -31,7 +33,9 @@
             "title": "STREETWEAR THAT FITS.",
             "subtitle": "Bold everyday essentials made for 2XL-6XL.",
             "button_label": "SHOP NOW",
-            "button_link": "shopify://collections/all"
+            "button_link": "shopify://collections/all",
+            "desktop_fallback_asset": "marcabold-hero-base.png",
+            "mobile_fallback_asset": "marcabold-hero-base.png"
           }
         }
       },
@@ -53,8 +57,8 @@
         "mobile_subtitle_size": 15,
         "fade_opacity": 70,
         "show_dots": true,
-        "autoplay": false,
-        "autoplay_interval": 5,
+        "autoplay": true,
+        "autoplay_interval": 3,
         "text_color": "#ffffff",
         "button_background": "#ffffff",
         "button_text_color": "#0b0b0b",
