@@ -232,7 +232,7 @@
   }
 
   .marcabold-image-tiles__inner {
-    width: min(var(--mit-max-width), 100%);
+    width: min(var(--mit-max-width), calc(100vw - (var(--mit-side-padding) * 2)));
     margin-inline: auto;
   }
 
@@ -426,10 +426,10 @@
       "id": "max_width",
       "label": "Max width",
       "min": 1000,
-      "max": 1440,
+      "max": 1600,
       "step": 20,
       "unit": "px",
-      "default": 1340
+      "default": 1440
     },
     {
       "type": "range",
@@ -459,7 +459,7 @@
       "max": 80,
       "step": 1,
       "unit": "px",
-      "default": 37
+      "default": 8
     },
     {
       "type": "range",
@@ -501,7 +501,7 @@
       "type": "color",
       "id": "background_color",
       "label": "Background",
-      "default": "#efefeb"
+      "default": "#ffffff"
     },
     {
       "type": "color",
