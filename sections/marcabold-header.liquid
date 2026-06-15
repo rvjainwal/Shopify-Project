@@ -1,0 +1,811 @@
+{% liquid
+  assign logo_link = section.settings.logo_link
+  if logo_link == blank
+    assign logo_link = routes.root_url
+  endif
+
+  assign account_url = routes.account_url
+  if account_url == blank
+    assign account_url = '/account'
+  endif
+
+  assign wishlist_url = section.settings.wishlist_link
+  if wishlist_url == blank
+    assign wishlist_url = '#'
+  endif
+
+  assign logo_render_width = section.settings.logo_width | times: 2
+  assign nav_blocks = section.blocks | where: 'type', 'nav_link'
+%}
+
+<header
+  id="MarcaboldHeader-{{ section.id }}"
+  class="marcabold-header{% if section.settings.sticky_header %} marcabold-header--sticky{% endif %}"
+  style="
+    --mb-header-bg: {{ section.settings.background_color }};
+    --mb-header-text: {{ section.settings.text_color }};
+    --mb-header-border: {{ section.settings.border_color }};
+    --mb-header-height: {{ section.settings.header_height }}px;
+    --mb-header-height-mobile: {{ section.settings.mobile_header_height }}px;
+    --mb-logo-width: {{ section.settings.logo_width }}px;
+    --mb-logo-width-mobile: {{ section.settings.logo_width_mobile }}px;
+    --mb-icon-size: {{ section.settings.icon_size }}px;
+    --mb-icon-size-mobile: {{ section.settings.mobile_icon_size }}px;
+    --mb-left-padding: {{ section.settings.desktop_left_padding }}px;
+    --mb-right-padding: {{ section.settings.desktop_right_padding }}px;
+    --mb-mobile-padding: {{ section.settings.mobile_side_padding }}px;
+    --mb-icon-gap: {{ section.settings.icon_gap }}px;
+    --mb-icon-gap-mobile: {{ section.settings.mobile_icon_gap }}px;
+  "
+>
+  <div class="marcabold-header__inner">
+    <div class="marcabold-header__left">
+      {% if section.settings.show_menu_toggle %}
+        <details class="marcabold-header__menu">
+          <summary class="marcabold-header__menu-toggle" aria-label="Open menu">
+            {% if section.settings.menu_icon != blank %}
+              {{
+                section.settings.menu_icon
+                | image_url: width: 96
+                | image_tag: class: 'marcabold-header__icon-image', loading: 'eager', alt: ''
+              }}
+            {% else %}
+              <img
+                class="marcabold-header__icon-image"
+                src="{{ 'marcabold-header-menu.png' | asset_url }}"
+                alt=""
+                width="24"
+                height="24"
+                loading="eager"
+              >
+            {% endif %}
+          </summary>
+
+          <div class="marcabold-header__drawer" role="navigation" aria-label="Menu drawer">
+            <div class="marcabold-header__drawer-logo">
+              {% if section.settings.logo != blank %}
+                {{
+                  section.settings.logo
+                  | image_url: width: logo_render_width
+                  | image_tag:
+                    class: 'marcabold-header__drawer-logo-image',
+                    loading: 'lazy',
+                    widths: '120, 168, 240, 336',
+                    alt: shop.name
+                }}
+              {% else %}
+                <img
+                  class="marcabold-header__drawer-logo-image"
+                  src="{{ 'marcabold-logo.png' | asset_url }}"
+                  alt="{{ shop.name | escape }}"
+                  width="168"
+                  height="43"
+                  loading="lazy"
+                >
+              {% endif %}
+            </div>
+
+            <ul class="marcabold-header__drawer-list" role="list">
+              {% if section.settings.menu != blank and section.settings.menu.links.size > 0 %}
+                {% for link in section.settings.menu.links %}
+                  <li class="marcabold-header__drawer-item">
+                    <a href="{{ link.url }}" class="marcabold-header__drawer-link">
+                      {{ link.title | escape }}
+                    </a>
+
+                    {% if link.links != blank %}
+                      <ul class="marcabold-header__drawer-sublist" role="list">
+                        {% for child_link in link.links %}
+                          <li>
+                            <a href="{{ child_link.url }}" class="marcabold-header__drawer-sublink">
+                              {{ child_link.title | escape }}
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              {% else %}
+                {% for block in nav_blocks %}
+                  {% liquid
+                    assign drawer_block_url = block.settings.link
+                    if drawer_block_url == blank
+                      assign drawer_block_url = routes.all_products_collection_url
+                    endif
+                  %}
+                  <li class="marcabold-header__drawer-item" {{ block.shopify_attributes }}>
+                    <a href="{{ drawer_block_url }}" class="marcabold-header__drawer-link">
+                      {{ block.settings.label | escape }}
+                    </a>
+                  </li>
+                {% endfor %}
+              {% endif %}
+            </ul>
+          </div>
+        </details>
+      {% endif %}
+
+      {% if section.settings.show_left_links and nav_blocks.size > 0 %}
+        <nav class="marcabold-header__nav" aria-label="Primary navigation">
+          {% for block in nav_blocks %}
+            {% liquid
+              assign block_url = block.settings.link
+              if block_url == blank
+                assign block_url = routes.all_products_collection_url
+              endif
+            %}
+            <a class="marcabold-header__nav-link" href="{{ block_url }}" {{ block.shopify_attributes }}>
+              {{ block.settings.label | escape }}
+            </a>
+          {% endfor %}
+        </nav>
+      {% endif %}
+    </div>
+
+    <a class="marcabold-header__logo" href="{{ logo_link }}" aria-label="{{ shop.name | escape }}">
+      {% if section.settings.logo != blank %}
+        {{
+          section.settings.logo
+          | image_url: width: logo_render_width
+          | image_tag:
+            class: 'marcabold-header__logo-image',
+            loading: 'eager',
+            widths: '120, 168, 240, 336',
+            alt: shop.name
+        }}
+      {% else %}
+        <img
+          class="marcabold-header__logo-image"
+          src="{{ 'marcabold-logo.png' | asset_url }}"
+          alt="{{ shop.name | escape }}"
+          width="168"
+          height="43"
+          loading="eager"
+        >
+      {% endif %}
+    </a>
+
+    <div class="marcabold-header__actions" aria-label="Header actions">
+      {% if section.settings.show_search %}
+        <button
+          type="button"
+          class="marcabold-header__icon-button"
+          aria-label="Search"
+          on:click="#search-modal/showDialog"
+        >
+          {% if section.settings.search_icon != blank %}
+            {{
+              section.settings.search_icon
+              | image_url: width: 96
+              | image_tag: class: 'marcabold-header__icon-image', loading: 'eager', alt: ''
+            }}
+          {% else %}
+            <img
+              class="marcabold-header__icon-image"
+              src="{{ 'marcabold-header-search.png' | asset_url }}"
+              alt=""
+              width="24"
+              height="24"
+              loading="eager"
+            >
+          {% endif %}
+        </button>
+      {% endif %}
+
+      {% if section.settings.show_account %}
+        <a class="marcabold-header__icon-button" href="{{ account_url }}" aria-label="Account">
+          {% if section.settings.account_icon != blank %}
+            {{
+              section.settings.account_icon
+              | image_url: width: 96
+              | image_tag: class: 'marcabold-header__icon-image', loading: 'eager', alt: ''
+            }}
+          {% else %}
+            <img
+              class="marcabold-header__icon-image"
+              src="{{ 'marcabold-header-account.png' | asset_url }}"
+              alt=""
+              width="24"
+              height="24"
+              loading="eager"
+            >
+          {% endif %}
+        </a>
+      {% endif %}
+
+      {% if section.settings.show_wishlist %}
+        <a class="marcabold-header__icon-button" href="{{ wishlist_url }}" aria-label="Wishlist">
+          {% if section.settings.wishlist_icon != blank %}
+            {{
+              section.settings.wishlist_icon
+              | image_url: width: 96
+              | image_tag: class: 'marcabold-header__icon-image', loading: 'eager', alt: ''
+            }}
+          {% else %}
+            <img
+              class="marcabold-header__icon-image"
+              src="{{ 'marcabold-header-wishlist.png' | asset_url }}"
+              alt=""
+              width="24"
+              height="24"
+              loading="eager"
+            >
+          {% endif %}
+        </a>
+      {% endif %}
+
+      {% if section.settings.show_cart %}
+        <a class="marcabold-header__icon-button marcabold-header__cart" href="{{ routes.cart_url }}" aria-label="Cart">
+          {% if section.settings.cart_icon != blank %}
+            {{
+              section.settings.cart_icon
+              | image_url: width: 96
+              | image_tag: class: 'marcabold-header__icon-image', loading: 'eager', alt: ''
+            }}
+          {% else %}
+            <img
+              class="marcabold-header__icon-image"
+              src="{{ 'marcabold-header-bag.png' | asset_url }}"
+              alt=""
+              width="24"
+              height="24"
+              loading="eager"
+            >
+          {% endif %}
+          {% render 'cart-bubble', limit: 99, live_region: true %}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{% stylesheet %}
+  .marcabold-header {
+    position: relative;
+    z-index: 20;
+    height: var(--mb-header-height);
+    background: var(--mb-header-bg);
+    border-bottom: 1px solid var(--mb-header-border);
+    color: var(--mb-header-text);
+  }
+
+  .marcabold-header--sticky {
+    position: sticky;
+    top: 0;
+  }
+
+  .marcabold-header__inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    padding: 0 var(--mb-right-padding) 0 var(--mb-left-padding);
+  }
+
+  .marcabold-header__left,
+  .marcabold-header__actions,
+  .marcabold-header__nav {
+    display: flex;
+    align-items: center;
+  }
+
+  .marcabold-header__left {
+    min-width: 0;
+  }
+
+  .marcabold-header__nav {
+    gap: 16px;
+    margin-left: 16px;
+  }
+
+  .marcabold-header__nav-link,
+  .marcabold-header__drawer-link,
+  .marcabold-header__drawer-sublink {
+    color: var(--mb-header-text);
+    text-decoration: none;
+  }
+
+  .marcabold-header__nav-link {
+    font-family: Overpass, Inter, var(--font-body--family), sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .marcabold-header__logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    width: var(--mb-logo-width);
+    max-width: 34vw;
+    transform: translate(-50%, -50%);
+  }
+
+  .marcabold-header__logo-image,
+  .marcabold-header__drawer-logo-image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .marcabold-header__actions {
+    gap: var(--mb-icon-gap);
+    margin-left: auto;
+  }
+
+  .marcabold-header__menu {
+    position: relative;
+  }
+
+  .marcabold-header__menu-toggle,
+  .marcabold-header__icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--mb-icon-size);
+    height: var(--mb-icon-size);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .marcabold-header__menu-toggle {
+    list-style: none;
+  }
+
+  .marcabold-header__menu-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .marcabold-header__icon-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .marcabold-header__drawer {
+    position: fixed;
+    top: var(--mb-header-height);
+    left: 0;
+    width: min(360px, 90vw);
+    height: calc(100dvh - var(--mb-header-height));
+    padding: 28px 24px 36px;
+    overflow-y: auto;
+    background: var(--mb-header-bg);
+    border-right: 1px solid var(--mb-header-border);
+    box-shadow: 16px 0 40px rgb(0 0 0 / 0.08);
+    transform: translateX(-105%);
+    transition: transform 180ms ease;
+  }
+
+  .marcabold-header__menu[open] .marcabold-header__drawer {
+    transform: translateX(0);
+  }
+
+  .marcabold-header__drawer-logo {
+    width: min(var(--mb-logo-width), 180px);
+    margin-bottom: 28px;
+  }
+
+  .marcabold-header__drawer-list,
+  .marcabold-header__drawer-sublist {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .marcabold-header__drawer-item + .marcabold-header__drawer-item {
+    border-top: 1px solid var(--mb-header-border);
+  }
+
+  .marcabold-header__drawer-link {
+    display: flex;
+    padding: 16px 0;
+    font-family: Overpass, Inter, var(--font-body--family), sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .marcabold-header__drawer-sublist {
+    padding: 0 0 14px 14px;
+  }
+
+  .marcabold-header__drawer-sublink {
+    display: block;
+    padding: 7px 0;
+    color: #6b6b6b;
+    font-family: Inter, var(--font-body--family), sans-serif;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  .marcabold-header__cart {
+    position: relative;
+  }
+
+  .marcabold-header__cart .cart-bubble {
+    position: absolute;
+    top: -7px;
+    right: -9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 15px;
+    height: 15px;
+    color: #ffffff;
+    font-family: Inter, var(--font-body--family), sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .marcabold-header__cart .cart-bubble__background {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: #0b0b0b;
+  }
+
+  .marcabold-header__cart .cart-bubble__text {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 4px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .marcabold-header {
+      height: var(--mb-header-height-mobile);
+    }
+
+    .marcabold-header__inner {
+      padding-inline: var(--mb-mobile-padding);
+    }
+
+    .marcabold-header__nav {
+      display: none;
+    }
+
+    .marcabold-header__logo {
+      width: var(--mb-logo-width-mobile);
+      max-width: 30vw;
+    }
+
+    .marcabold-header__actions {
+      gap: var(--mb-icon-gap-mobile);
+    }
+
+    .marcabold-header__menu-toggle,
+    .marcabold-header__icon-button {
+      width: var(--mb-icon-size-mobile);
+      height: var(--mb-icon-size-mobile);
+    }
+
+    .marcabold-header__drawer {
+      top: var(--mb-header-height-mobile);
+      height: calc(100dvh - var(--mb-header-height-mobile));
+    }
+  }
+
+  @media screen and (max-width: 360px) {
+    .marcabold-header__logo {
+      width: 88px;
+    }
+
+    .marcabold-header__actions {
+      gap: 6px;
+    }
+
+    .marcabold-header__menu-toggle,
+    .marcabold-header__icon-button {
+      width: 18px;
+      height: 18px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Marcabold header",
+  "tag": "section",
+  "class": "marcabold-header-section",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image"
+    },
+    {
+      "type": "url",
+      "id": "logo_link",
+      "label": "Logo link"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 80,
+      "max": 260,
+      "step": 4,
+      "unit": "px",
+      "default": 168
+    },
+    {
+      "type": "range",
+      "id": "logo_width_mobile",
+      "label": "Mobile logo width",
+      "min": 72,
+      "max": 180,
+      "step": 4,
+      "unit": "px",
+      "default": 112
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_menu_toggle",
+      "label": "Show menu toggle",
+      "default": true
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Drawer menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_left_links",
+      "label": "Show desktop left links",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Actions"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "Show search",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Show account",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_wishlist",
+      "label": "Show wishlist",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "wishlist_link",
+      "label": "Wishlist link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show cart",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Icon images"
+    },
+    {
+      "type": "image_picker",
+      "id": "menu_icon",
+      "label": "Menu icon"
+    },
+    {
+      "type": "image_picker",
+      "id": "search_icon",
+      "label": "Search icon"
+    },
+    {
+      "type": "image_picker",
+      "id": "account_icon",
+      "label": "Account icon"
+    },
+    {
+      "type": "image_picker",
+      "id": "wishlist_icon",
+      "label": "Wishlist icon"
+    },
+    {
+      "type": "image_picker",
+      "id": "cart_icon",
+      "label": "Cart icon"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_header",
+      "label": "Stick header to top",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "header_height",
+      "label": "Desktop height",
+      "min": 44,
+      "max": 90,
+      "step": 1,
+      "unit": "px",
+      "default": 54
+    },
+    {
+      "type": "range",
+      "id": "mobile_header_height",
+      "label": "Mobile height",
+      "min": 44,
+      "max": 78,
+      "step": 1,
+      "unit": "px",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "desktop_left_padding",
+      "label": "Desktop left padding",
+      "min": 8,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "desktop_right_padding",
+      "label": "Desktop right padding",
+      "min": 8,
+      "max": 96,
+      "step": 1,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "mobile_side_padding",
+      "label": "Mobile side padding",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Desktop icon size",
+      "min": 16,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "mobile_icon_size",
+      "label": "Mobile icon size",
+      "min": 16,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "icon_gap",
+      "label": "Desktop icon gap",
+      "min": 8,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "mobile_icon_gap",
+      "label": "Mobile icon gap",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text and icon color",
+      "default": "#0b0b0b"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Bottom border",
+      "default": "#e7e7e2"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "nav_link",
+      "name": "Left navigation link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "New in"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marcabold header",
+      "blocks": [
+        {
+          "type": "nav_link",
+          "settings": {
+            "label": "New in"
+          }
+        },
+        {
+          "type": "nav_link",
+          "settings": {
+            "label": "Collections"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

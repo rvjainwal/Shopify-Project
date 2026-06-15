@@ -11,6 +11,55 @@
   "type": "header",
   "name": "Header",
   "sections": {
+    "marcabold_header": {
+      "type": "marcabold-header",
+      "blocks": {
+        "nav_new_in": {
+          "type": "nav_link",
+          "settings": {
+            "label": "New in",
+            "link": "shopify://collections/all"
+          }
+        },
+        "nav_collections": {
+          "type": "nav_link",
+          "settings": {
+            "label": "Collections",
+            "link": "shopify://collections/all"
+          }
+        }
+      },
+      "block_order": [
+        "nav_new_in",
+        "nav_collections"
+      ],
+      "settings": {
+        "logo_link": "",
+        "logo_width": 168,
+        "logo_width_mobile": 112,
+        "show_menu_toggle": true,
+        "menu": "main-menu",
+        "show_left_links": true,
+        "show_search": true,
+        "show_account": true,
+        "show_wishlist": true,
+        "wishlist_link": "",
+        "show_cart": true,
+        "sticky_header": false,
+        "header_height": 54,
+        "mobile_header_height": 52,
+        "desktop_left_padding": 16,
+        "desktop_right_padding": 56,
+        "mobile_side_padding": 12,
+        "icon_size": 24,
+        "mobile_icon_size": 20,
+        "icon_gap": 26,
+        "mobile_icon_gap": 10,
+        "background_color": "#ffffff",
+        "text_color": "#0b0b0b",
+        "border_color": "#e7e7e2"
+      }
+    },
     "header_section": {
       "type": "header",
       "blocks": {
@@ -91,6 +140,7 @@
     }
   },
   "order": [
+    "marcabold_header",
     "header_section"
   ]
 }
