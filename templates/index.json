@@ -67,6 +67,126 @@
         "dot_inactive_opacity": 48
       }
     },
+    "marcabold_announcement_bar": {
+      "type": "marcabold-offers-bar",
+      "blocks": {
+        "offer_bold10_a": {
+          "type": "offer",
+          "settings": {
+            "text": "10% OFF On Orders Above ₹1299* Code:BOLD10",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        },
+        "offer_bold15_a": {
+          "type": "offer",
+          "settings": {
+            "text": "Get 15% OFF On Orders Above ₹1999* Code: BOLD15",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        },
+        "offer_bold10_b": {
+          "type": "offer",
+          "settings": {
+            "text": "10% OFF On Orders Above ₹1299* Code:BOLD10",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        },
+        "offer_bold15_b": {
+          "type": "offer",
+          "settings": {
+            "text": "Get 15% OFF On Orders Above ₹1999* Code: BOLD15",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        }
+      },
+      "block_order": [
+        "offer_bold10_a",
+        "offer_bold15_a",
+        "offer_bold10_b",
+        "offer_bold15_b"
+      ],
+      "settings": {
+        "accessibility_label": "Store offers",
+        "bar_height": 44,
+        "enable_scroll": true,
+        "scroll_duration": 28,
+        "offer_gap": 96,
+        "background_color": "#f1ec73",
+        "text_color": "#000000",
+        "border_color": "#000000"
+      }
+    },
+    "marcabold_image_tiles": {
+      "type": "marcabold-image-tiles",
+      "blocks": {
+        "tile_graphic_tees": {
+          "type": "tile",
+          "settings": {
+            "fallback_asset": "marcabold-category-graphic-tees.png",
+            "mobile_fallback_asset": "",
+            "label": "Graphic Tees",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        },
+        "tile_oversized": {
+          "type": "tile",
+          "settings": {
+            "fallback_asset": "marcabold-category-oversized.png",
+            "mobile_fallback_asset": "",
+            "label": "Oversized Fits",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        },
+        "tile_sweatshirts": {
+          "type": "tile",
+          "settings": {
+            "fallback_asset": "marcabold-category-sweatshirts.png",
+            "mobile_fallback_asset": "",
+            "label": "Sweatshirts",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        },
+        "tile_sunday": {
+          "type": "tile",
+          "settings": {
+            "fallback_asset": "marcabold-category-sunday.png",
+            "mobile_fallback_asset": "",
+            "label": "Sunday Edit",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        }
+      },
+      "block_order": [
+        "tile_graphic_tees",
+        "tile_oversized",
+        "tile_sweatshirts",
+        "tile_sunday"
+      ],
+      "settings": {
+        "eyebrow": "SHOP BY CATEGORY.",
+        "heading": "Start with style. Your size is already here.",
+        "max_width": 1340,
+        "padding_top": 8,
+        "padding_bottom": 56,
+        "side_padding": 37,
+        "tile_gap": 2,
+        "image_height": 415,
+        "mobile_image_height": 420,
+        "show_slider_dots": true,
+        "background_color": "#efefeb",
+        "eyebrow_color": "#828282",
+        "heading_color": "#212121",
+        "label_color": "#222222"
+      }
+    },
     "product_list_qU3bEB": {
       "type": "product-list",
       "blocks": {
@@ -322,6 +442,8 @@
   },
   "order": [
     "marcabold_banner_slider",
+    "marcabold_announcement_bar",
+    "marcabold_image_tiles",
     "product_list_qU3bEB"
   ]
 }

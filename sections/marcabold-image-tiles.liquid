@@ -1,0 +1,611 @@
+{% liquid
+  assign tile_count = section.blocks.size
+  assign use_desktop_slider = false
+  if tile_count > 4
+    assign use_desktop_slider = true
+  endif
+%}
+
+<marcabold-image-tiles
+  id="MarcaboldImageTiles-{{ section.id }}"
+  class="marcabold-image-tiles{% if use_desktop_slider %} marcabold-image-tiles--slider{% endif %}"
+  style="
+    --mit-bg: {{ section.settings.background_color }};
+    --mit-eyebrow: {{ section.settings.eyebrow_color }};
+    --mit-heading: {{ section.settings.heading_color }};
+    --mit-label: {{ section.settings.label_color }};
+    --mit-max-width: {{ section.settings.max_width }}px;
+    --mit-padding-top: {{ section.settings.padding_top }}px;
+    --mit-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --mit-side-padding: {{ section.settings.side_padding }}px;
+    --mit-gap: {{ section.settings.tile_gap }}px;
+    --mit-image-height: {{ section.settings.image_height }}px;
+    --mit-mobile-image-height: {{ section.settings.mobile_image_height }}px;
+  "
+>
+  <div class="marcabold-image-tiles__inner">
+    <div class="marcabold-image-tiles__header">
+      {% if section.settings.eyebrow != blank %}
+        <p class="marcabold-image-tiles__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {% endif %}
+
+      {% if section.settings.heading != blank %}
+        <h2 class="marcabold-image-tiles__heading">{{ section.settings.heading | escape }}</h2>
+      {% endif %}
+    </div>
+
+    <div class="marcabold-image-tiles__viewport">
+      <div class="marcabold-image-tiles__track" data-tiles-track>
+        {% if section.blocks.size > 0 %}
+          {% for block in section.blocks %}
+            {% liquid
+              assign tile_label = block.settings.label
+              assign tile_link = block.settings.link
+              if tile_link == blank
+                assign tile_link = routes.all_products_collection_url
+              endif
+
+              assign fallback_asset = block.settings.fallback_asset
+              if fallback_asset == blank
+                assign fallback_asset = 'marcabold-category-graphic-tees.png'
+              endif
+
+              assign mobile_fallback_asset = block.settings.mobile_fallback_asset
+              if mobile_fallback_asset == blank
+                assign mobile_fallback_asset = fallback_asset
+              endif
+
+              assign image_alt = block.settings.image.alt | default: tile_label
+              if image_alt == blank
+                assign image_alt = shop.name
+              endif
+            %}
+
+            <a
+              class="marcabold-image-tiles__card"
+              href="{{ tile_link }}"
+              data-tiles-slide
+              {{ block.shopify_attributes }}
+              {% if block.settings.open_in_new_tab %}
+                target="_blank" rel="noopener noreferrer"
+              {% endif %}
+            >
+              <picture class="marcabold-image-tiles__media">
+                {% if block.settings.mobile_image != blank %}
+                  <source
+                    media="(max-width: 749px)"
+                    srcset="
+                      {{ block.settings.mobile_image | image_url: width: 480 }} 480w,
+                      {{ block.settings.mobile_image | image_url: width: 720 }} 720w,
+                      {{ block.settings.mobile_image | image_url: width: 960 }} 960w
+                    "
+                    sizes="82vw"
+                  >
+                {% elsif mobile_fallback_asset != blank %}
+                  <source
+                    media="(max-width: 749px)"
+                    srcset="{{ mobile_fallback_asset | asset_url }}"
+                    sizes="82vw"
+                  >
+                {% endif %}
+
+                {% if block.settings.image != blank %}
+                  {{
+                    block.settings.image
+                    | image_url: width: 1200
+                    | image_tag:
+                      widths: '336, 480, 720, 960, 1200',
+                      sizes: '(min-width: 990px) 25vw, 82vw',
+                      class: 'marcabold-image-tiles__image',
+                      loading: 'lazy',
+                      alt: image_alt
+                  }}
+                {% else %}
+                  <img
+                    class="marcabold-image-tiles__image"
+                    src="{{ fallback_asset | asset_url }}"
+                    alt="{{ image_alt | escape }}"
+                    width="336"
+                    height="415"
+                    loading="lazy"
+                  >
+                {% endif %}
+              </picture>
+
+              {% if tile_label != blank %}
+                <span class="marcabold-image-tiles__label">{{ tile_label | escape }}</span>
+              {% endif %}
+            </a>
+          {% endfor %}
+        {% else %}
+          {% assign fallback_labels = 'Graphic Tees,Oversized Fits,Sweatshirts,Sunday Edit' | split: ',' %}
+          {% assign fallback_images = 'marcabold-category-graphic-tees.png,marcabold-category-oversized.png,marcabold-category-sweatshirts.png,marcabold-category-sunday.png' | split: ',' %}
+          {% for label in fallback_labels %}
+            <a class="marcabold-image-tiles__card" href="{{ routes.all_products_collection_url }}" data-tiles-slide>
+              <picture class="marcabold-image-tiles__media">
+                <img
+                  class="marcabold-image-tiles__image"
+                  src="{{ fallback_images[forloop.index0] | asset_url }}"
+                  alt="{{ label | escape }}"
+                  width="336"
+                  height="415"
+                  loading="lazy"
+                >
+              </picture>
+              <span class="marcabold-image-tiles__label">{{ label | escape }}</span>
+            </a>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    {% if section.settings.show_slider_dots and tile_count > 4 %}
+      <div class="marcabold-image-tiles__dots" aria-label="Category slides">
+        {% for block in section.blocks %}
+          <button
+            class="marcabold-image-tiles__dot"
+            type="button"
+            data-tiles-dot
+            data-slide-index="{{ forloop.index0 }}"
+            aria-label="Go to category {{ forloop.index }}"
+            aria-current="{% if forloop.first %}true{% else %}false{% endif %}"
+          ></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</marcabold-image-tiles>
+
+<script>
+  (() => {
+    if (customElements.get('marcabold-image-tiles')) return;
+
+    class MarcaboldImageTiles extends HTMLElement {
+      connectedCallback() {
+        this.track = this.querySelector('[data-tiles-track]');
+        this.slides = Array.from(this.querySelectorAll('[data-tiles-slide]'));
+        this.dots = Array.from(this.querySelectorAll('[data-tiles-dot]'));
+
+        if (!this.track || this.slides.length === 0) return;
+
+        this.dots.forEach((dot) => {
+          dot.addEventListener('click', () => this.goTo(Number(dot.dataset.slideIndex || 0)));
+        });
+
+        this.track.addEventListener('scroll', () => this.queueUpdate(), { passive: true });
+        window.addEventListener('resize', () => this.queueUpdate(), { passive: true });
+        this.updateDots();
+      }
+
+      disconnectedCallback() {
+        if (this.raf) window.cancelAnimationFrame(this.raf);
+      }
+
+      goTo(index) {
+        const target = this.slides[Math.max(0, Math.min(index, this.slides.length - 1))];
+        if (!target) return;
+
+        this.track.scrollTo({
+          left: target.offsetLeft,
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        });
+      }
+
+      queueUpdate() {
+        if (this.raf) return;
+        this.raf = window.requestAnimationFrame(() => {
+          this.raf = null;
+          this.updateDots();
+        });
+      }
+
+      updateDots() {
+        if (!this.dots.length) return;
+
+        const scrollLeft = this.track.scrollLeft;
+        let activeIndex = 0;
+        let closestDistance = Infinity;
+
+        this.slides.forEach((slide, index) => {
+          const distance = Math.abs(slide.offsetLeft - scrollLeft);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            activeIndex = index;
+          }
+        });
+
+        this.dots.forEach((dot, index) => {
+          dot.setAttribute('aria-current', index === activeIndex ? 'true' : 'false');
+        });
+      }
+    }
+
+    customElements.define('marcabold-image-tiles', MarcaboldImageTiles);
+  })();
+</script>
+
+{% stylesheet %}
+  .marcabold-image-tiles {
+    display: block;
+    background: var(--mit-bg);
+    padding: var(--mit-padding-top) var(--mit-side-padding) var(--mit-padding-bottom);
+  }
+
+  .marcabold-image-tiles__inner {
+    width: min(var(--mit-max-width), 100%);
+    margin-inline: auto;
+  }
+
+  .marcabold-image-tiles__header {
+    max-width: 720px;
+    margin-bottom: 16px;
+  }
+
+  .marcabold-image-tiles__eyebrow,
+  .marcabold-image-tiles__heading {
+    margin: 0;
+    letter-spacing: 0;
+  }
+
+  .marcabold-image-tiles__eyebrow {
+    color: var(--mit-eyebrow);
+    font-family: Satoshi, Inter, var(--font-body--family), sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 22px;
+    text-transform: uppercase;
+  }
+
+  .marcabold-image-tiles__heading {
+    color: var(--mit-heading);
+    font-family: Overpass, Inter, var(--font-heading--family), sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.04;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  .marcabold-image-tiles__viewport {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .marcabold-image-tiles__track {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--mit-gap);
+  }
+
+  .marcabold-image-tiles--slider .marcabold-image-tiles__viewport {
+    overflow: visible;
+  }
+
+  .marcabold-image-tiles--slider .marcabold-image-tiles__track {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .marcabold-image-tiles--slider .marcabold-image-tiles__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .marcabold-image-tiles__card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    color: var(--mit-label);
+    text-decoration: none;
+  }
+
+  .marcabold-image-tiles--slider .marcabold-image-tiles__card {
+    flex: 0 0 calc((100% - (var(--mit-gap) * 3)) / 4);
+    scroll-snap-align: start;
+  }
+
+  .marcabold-image-tiles__media {
+    display: block;
+    width: 100%;
+    height: var(--mit-image-height);
+    overflow: hidden;
+    background: #ddd9cf;
+  }
+
+  .marcabold-image-tiles__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 220ms ease;
+  }
+
+  .marcabold-image-tiles__card:hover .marcabold-image-tiles__image {
+    transform: scale(1.02);
+  }
+
+  .marcabold-image-tiles__label {
+    display: block;
+    padding: 10px 5px 0;
+    color: inherit;
+    font-family: Satoshi, Inter, var(--font-body--family), sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 22px;
+    letter-spacing: 0;
+  }
+
+  .marcabold-image-tiles__dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .marcabold-image-tiles__dot {
+    width: 6px;
+    height: 6px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: #a9a9a9;
+    cursor: pointer;
+    transition: width 160ms ease, background-color 160ms ease;
+  }
+
+  .marcabold-image-tiles__dot[aria-current='true'] {
+    width: 24px;
+    background: #212121;
+  }
+
+  @media screen and (max-width: 989px) {
+    .marcabold-image-tiles__track {
+      display: flex;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-behavior: smooth;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .marcabold-image-tiles__track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .marcabold-image-tiles__card {
+      flex: 0 0 calc((100% - var(--mit-gap)) / 2);
+      scroll-snap-align: start;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .marcabold-image-tiles {
+      padding: 24px 16px 36px;
+    }
+
+    .marcabold-image-tiles__heading {
+      font-size: 24px;
+      line-height: 1.08;
+    }
+
+    .marcabold-image-tiles__card {
+      flex-basis: 82vw;
+    }
+
+    .marcabold-image-tiles__media {
+      height: var(--mit-mobile-image-height);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Marcabold image tiles",
+  "tag": "section",
+  "class": "marcabold-image-tiles-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "SHOP BY CATEGORY."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Start with style. Your size is already here."
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width",
+      "min": 1000,
+      "max": 1440,
+      "step": 20,
+      "unit": "px",
+      "default": 1340
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 24,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "label": "Side padding",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 37
+    },
+    {
+      "type": "range",
+      "id": "tile_gap",
+      "label": "Tile gap",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "image_height",
+      "label": "Desktop image height",
+      "min": 280,
+      "max": 560,
+      "step": 5,
+      "unit": "px",
+      "default": 415
+    },
+    {
+      "type": "range",
+      "id": "mobile_image_height",
+      "label": "Mobile image height",
+      "min": 300,
+      "max": 620,
+      "step": 4,
+      "unit": "px",
+      "default": 420
+    },
+    {
+      "type": "checkbox",
+      "id": "show_slider_dots",
+      "label": "Show slider dots for 5+ tiles",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#efefeb"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow color",
+      "default": "#828282"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#212121"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#222222"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Image tile",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Desktop image"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile image"
+        },
+        {
+          "type": "text",
+          "id": "fallback_asset",
+          "label": "Fallback asset filename",
+          "default": "marcabold-category-graphic-tees.png"
+        },
+        {
+          "type": "text",
+          "id": "mobile_fallback_asset",
+          "label": "Mobile fallback asset filename"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Graphic Tees"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_in_new_tab",
+          "label": "Open in new tab",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marcabold image tiles",
+      "blocks": [
+        {
+          "type": "tile",
+          "settings": {
+            "label": "Graphic Tees",
+            "link": "shopify://collections/all",
+            "fallback_asset": "marcabold-category-graphic-tees.png"
+          }
+        },
+        {
+          "type": "tile",
+          "settings": {
+            "label": "Oversized Fits",
+            "link": "shopify://collections/all",
+            "fallback_asset": "marcabold-category-oversized.png"
+          }
+        },
+        {
+          "type": "tile",
+          "settings": {
+            "label": "Sweatshirts",
+            "link": "shopify://collections/all",
+            "fallback_asset": "marcabold-category-sweatshirts.png"
+          }
+        },
+        {
+          "type": "tile",
+          "settings": {
+            "label": "Sunday Edit",
+            "link": "shopify://collections/all",
+            "fallback_asset": "marcabold-category-sunday.png"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

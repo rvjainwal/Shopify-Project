@@ -1,0 +1,258 @@
+{% liquid
+  assign offer_count = section.blocks.size
+  if offer_count == 0
+    assign offer_count = 1
+  endif
+%}
+
+<section
+  id="MarcaboldAnnouncementBar-{{ section.id }}"
+  class="marcabold-announcement-bar"
+  aria-label="{{ section.settings.accessibility_label | escape }}"
+  style="
+    --mab-height: {{ section.settings.bar_height }}px;
+    --mab-bg: {{ section.settings.background_color }};
+    --mab-text: {{ section.settings.text_color }};
+    --mab-border: {{ section.settings.border_color }};
+    --mab-gap: {{ section.settings.offer_gap }}px;
+    --mab-duration: {{ section.settings.scroll_duration }}s;
+  "
+>
+  <div class="marcabold-announcement-bar__viewport">
+    <div class="marcabold-announcement-bar__track{% if section.settings.enable_scroll %} marcabold-announcement-bar__track--scroll{% endif %}">
+      {% for repeat_index in (1..2) %}
+        {% if section.blocks.size > 0 %}
+          {% for block in section.blocks %}
+            {% liquid
+              assign offer_link = block.settings.link
+              assign offer_text = block.settings.text
+            %}
+            <div class="marcabold-announcement-bar__item" {{ block.shopify_attributes }}>
+              {% if offer_link != blank %}
+                <a
+                  class="marcabold-announcement-bar__link"
+                  href="{{ offer_link }}"
+                  {% if block.settings.open_in_new_tab %}
+                    target="_blank" rel="noopener noreferrer"
+                  {% endif %}
+                >
+                  {{ offer_text | escape }}
+                </a>
+              {% else %}
+                <span>{{ offer_text | escape }}</span>
+              {% endif %}
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="marcabold-announcement-bar__item">
+            <a class="marcabold-announcement-bar__link" href="{{ routes.all_products_collection_url }}">
+              10% OFF On Orders Above ₹1299* Code:BOLD10
+            </a>
+          </div>
+          <div class="marcabold-announcement-bar__item">
+            <a class="marcabold-announcement-bar__link" href="{{ routes.all_products_collection_url }}">
+              Get 15% OFF On Orders Above ₹1999* Code: BOLD15
+            </a>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .marcabold-announcement-bar {
+    height: var(--mab-height);
+    overflow: hidden;
+    background: var(--mab-bg);
+    border-block: 1px solid var(--mab-border);
+    color: var(--mab-text);
+  }
+
+  .marcabold-announcement-bar__viewport {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .marcabold-announcement-bar__track {
+    display: flex;
+    align-items: center;
+    min-width: max-content;
+    height: 100%;
+    gap: var(--mab-gap);
+    padding-inline: 6px;
+  }
+
+  .marcabold-announcement-bar__track--scroll {
+    animation: marcabold-announcement-scroll var(--mab-duration) linear infinite;
+  }
+
+  .marcabold-announcement-bar:hover .marcabold-announcement-bar__track--scroll {
+    animation-play-state: paused;
+  }
+
+  .marcabold-announcement-bar__item {
+    flex: 0 0 auto;
+    color: inherit;
+    font-family: Inter, var(--font-body--family), sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: normal;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .marcabold-announcement-bar__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  @keyframes marcabold-announcement-scroll {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .marcabold-announcement-bar__item {
+      font-size: 12px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Marcabold offers",
+  "tag": "section",
+  "class": "marcabold-offers-bar-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "accessibility_label",
+      "label": "Accessibility label",
+      "default": "Store offers"
+    },
+    {
+      "type": "range",
+      "id": "bar_height",
+      "label": "Height",
+      "min": 32,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_scroll",
+      "label": "Enable continuous scroll",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "scroll_duration",
+      "label": "Scroll duration",
+      "min": 12,
+      "max": 60,
+      "step": 1,
+      "unit": "s",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "offer_gap",
+      "label": "Offer gap",
+      "min": 32,
+      "max": 180,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#f1ec73"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#000000"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "offer",
+      "name": "Offer",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "10% OFF On Orders Above ₹1299* Code:BOLD10"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_in_new_tab",
+          "label": "Open in new tab",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marcabold offers",
+      "blocks": [
+        {
+          "type": "offer",
+          "settings": {
+            "text": "10% OFF On Orders Above ₹1299* Code:BOLD10",
+            "link": "shopify://collections/all"
+          }
+        },
+        {
+          "type": "offer",
+          "settings": {
+            "text": "Get 15% OFF On Orders Above ₹1999* Code: BOLD15",
+            "link": "shopify://collections/all"
+          }
+        },
+        {
+          "type": "offer",
+          "settings": {
+            "text": "10% OFF On Orders Above ₹1299* Code:BOLD10",
+            "link": "shopify://collections/all"
+          }
+        },
+        {
+          "type": "offer",
+          "settings": {
+            "text": "Get 15% OFF On Orders Above ₹1999* Code: BOLD15",
+            "link": "shopify://collections/all"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
