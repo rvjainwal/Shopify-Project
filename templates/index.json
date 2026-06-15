@@ -187,6 +187,98 @@
         "label_color": "#222222"
       }
     },
+    "marcabold_fit_banner": {
+      "type": "marcabold-fit-banner",
+      "settings": {
+        "left_fallback_asset": "marcabold-fit-left-alt.png",
+        "right_fallback_asset": "marcabold-fit-right.png",
+        "banner_link": "shopify://collections/all",
+        "eyebrow": "TEES THAT ACTUALLY FIT.",
+        "heading": "Soft fabrics. Relaxed fits. Loud personality.",
+        "button_label": "Shop Now",
+        "button_link": "shopify://collections/all",
+        "max_width": 1370,
+        "desktop_height": 650,
+        "mobile_height": 560,
+        "side_padding": 37,
+        "padding_top": 0,
+        "padding_bottom": 64,
+        "background_color": "#efefeb",
+        "text_color": "#ffffff"
+      }
+    },
+    "marcabold_size_tiles": {
+      "type": "marcabold-size-tiles",
+      "blocks": {
+        "size_2xl": {
+          "type": "size",
+          "settings": {
+            "fallback_asset": "marcabold-size-2xl.png",
+            "label": "2XL",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        },
+        "size_3xl": {
+          "type": "size",
+          "settings": {
+            "fallback_asset": "marcabold-size-3xl.png",
+            "label": "3XL",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        },
+        "size_4xl": {
+          "type": "size",
+          "settings": {
+            "fallback_asset": "marcabold-size-4xl.png",
+            "label": "4XL",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        },
+        "size_5xl": {
+          "type": "size",
+          "settings": {
+            "fallback_asset": "marcabold-size-5xl.png",
+            "label": "5XL",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        },
+        "size_6xl": {
+          "type": "size",
+          "settings": {
+            "fallback_asset": "marcabold-size-6xl.png",
+            "label": "6XL",
+            "link": "shopify://collections/all",
+            "open_in_new_tab": false
+          }
+        }
+      },
+      "block_order": [
+        "size_2xl",
+        "size_3xl",
+        "size_4xl",
+        "size_5xl",
+        "size_6xl"
+      ],
+      "settings": {
+        "eyebrow": "SHOP BY SIZE",
+        "heading": "BUILT TO FIT BIGGER.",
+        "max_width": 1100,
+        "padding_top": 0,
+        "padding_bottom": 52,
+        "side_padding": 37,
+        "tile_gap": 2,
+        "image_height": 290,
+        "mobile_image_height": 420,
+        "background_color": "#efefeb",
+        "eyebrow_color": "#828282",
+        "heading_color": "#212121",
+        "label_color": "#222222"
+      }
+    },
     "product_list_qU3bEB": {
       "type": "product-list",
       "blocks": {
@@ -444,6 +536,8 @@
     "marcabold_banner_slider",
     "marcabold_announcement_bar",
     "marcabold_image_tiles",
+    "marcabold_fit_banner",
+    "marcabold_size_tiles",
     "product_list_qU3bEB"
   ]
 }
