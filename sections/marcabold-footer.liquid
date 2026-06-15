@@ -1,0 +1,803 @@
+{% liquid
+  assign logo_asset = section.settings.logo_fallback_asset
+  if logo_asset == blank
+    assign logo_asset = 'marcabold-logo.png'
+  endif
+
+  assign logo_link = section.settings.logo_link
+  if logo_link == blank
+    assign logo_link = routes.root_url
+  endif
+%}
+
+<footer
+  id="MarcaboldFooter-{{ section.id }}"
+  class="marcabold-footer"
+  style="
+    --mf-bg: {{ section.settings.background_color }};
+    --mf-card-bg: {{ section.settings.card_background }};
+    --mf-text: {{ section.settings.text_color }};
+    --mf-muted: {{ section.settings.muted_text_color }};
+    --mf-max-width: {{ section.settings.max_width }}px;
+    --mf-side-padding: {{ section.settings.side_padding }}px;
+    --mf-padding-top: {{ section.settings.padding_top }}px;
+    --mf-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --mf-panel-gap: {{ section.settings.panel_gap }}px;
+    --mf-input-width: {{ section.settings.input_width }}px;
+    --mf-button-width: {{ section.settings.button_width }}px;
+    --mf-logo-width: {{ section.settings.logo_width }}px;
+  "
+>
+  <div class="marcabold-footer__inner">
+    {% if section.settings.show_newsletter %}
+      <div class="marcabold-footer__newsletter">
+        <div class="marcabold-footer__newsletter-copy">
+          {% if section.settings.newsletter_eyebrow != blank %}
+            <p class="marcabold-footer__eyebrow">{{ section.settings.newsletter_eyebrow | escape }}</p>
+          {% endif %}
+
+          {% if section.settings.newsletter_heading != blank %}
+            <h2 class="marcabold-footer__heading">{{ section.settings.newsletter_heading | escape }}</h2>
+          {% endif %}
+
+          {% if section.settings.newsletter_text != blank %}
+            <p class="marcabold-footer__text">{{ section.settings.newsletter_text | escape }}</p>
+          {% endif %}
+        </div>
+
+        {% form 'customer', id: 'MarcaboldFooterSignup', class: 'marcabold-footer__form' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <label class="visually-hidden" for="MarcaboldFooterEmail-{{ section.id }}">
+            {{ section.settings.email_placeholder | escape }}
+          </label>
+          <input
+            id="MarcaboldFooterEmail-{{ section.id }}"
+            class="marcabold-footer__input"
+            type="email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            placeholder="{{ section.settings.email_placeholder | escape }}"
+            required
+          >
+          <button class="marcabold-footer__submit" type="submit">
+            {{ section.settings.button_label | escape }}
+          </button>
+
+          {% if form.posted_successfully? %}
+            <p class="marcabold-footer__form-message" tabindex="-1">
+              {{ section.settings.success_message | escape }}
+            </p>
+          {% elsif form.errors %}
+            <div class="marcabold-footer__form-message marcabold-footer__form-message--error">
+              {{ form.errors | default_errors }}
+            </div>
+          {% endif %}
+        {% endform %}
+      </div>
+    {% endif %}
+
+    <div class="marcabold-footer__links-panel">
+      <div class="marcabold-footer__columns">
+        {% for block in section.blocks %}
+          {% liquid
+            assign column_menu = block.settings.menu
+            assign has_menu_links = false
+            if column_menu != blank and column_menu.links.size > 0
+              assign has_menu_links = true
+            endif
+          %}
+
+          <div class="marcabold-footer__column" {{ block.shopify_attributes }}>
+            {% if block.settings.heading != blank %}
+              <h3 class="marcabold-footer__column-heading">{{ block.settings.heading | escape }}</h3>
+            {% endif %}
+
+            <ul class="marcabold-footer__menu" role="list">
+              {% if has_menu_links %}
+                {% for link in column_menu.links %}
+                  <li>
+                    <a href="{{ link.url }}" {% if link.current %}aria-current="page"{% endif %}>
+                      {{ link.title | escape }}
+                    </a>
+                  </li>
+                {% endfor %}
+              {% else %}
+                {% if block.settings.link_1_label != blank %}
+                  <li>
+                    <a href="{{ block.settings.link_1_url | default: routes.root_url }}">
+                      {{ block.settings.link_1_label | escape }}
+                    </a>
+                  </li>
+                {% endif %}
+                {% if block.settings.link_2_label != blank %}
+                  <li>
+                    <a href="{{ block.settings.link_2_url | default: routes.root_url }}">
+                      {{ block.settings.link_2_label | escape }}
+                    </a>
+                  </li>
+                {% endif %}
+                {% if block.settings.link_3_label != blank %}
+                  <li>
+                    <a href="{{ block.settings.link_3_url | default: routes.root_url }}">
+                      {{ block.settings.link_3_label | escape }}
+                    </a>
+                  </li>
+                {% endif %}
+                {% if block.settings.link_4_label != blank %}
+                  <li>
+                    <a href="{{ block.settings.link_4_url | default: routes.root_url }}">
+                      {{ block.settings.link_4_label | escape }}
+                    </a>
+                  </li>
+                {% endif %}
+                {% if block.settings.link_5_label != blank %}
+                  <li>
+                    <a href="{{ block.settings.link_5_url | default: routes.root_url }}">
+                      {{ block.settings.link_5_label | escape }}
+                    </a>
+                  </li>
+                {% endif %}
+                {% if block.settings.link_6_label != blank %}
+                  <li>
+                    <a href="{{ block.settings.link_6_url | default: routes.root_url }}">
+                      {{ block.settings.link_6_label | escape }}
+                    </a>
+                  </li>
+                {% endif %}
+              {% endif %}
+            </ul>
+          </div>
+        {% endfor %}
+      </div>
+
+      <a class="marcabold-footer__logo-link" href="{{ logo_link }}" aria-label="{{ shop.name | escape }}">
+        {% if section.settings.logo != blank %}
+          {{
+            section.settings.logo
+            | image_url: width: 600
+            | image_tag:
+              widths: '180, 250, 360, 500, 600',
+              sizes: '(max-width: 749px) 210px, 250px',
+              class: 'marcabold-footer__logo',
+              loading: 'lazy',
+              alt: shop.name
+          }}
+        {% else %}
+          <img
+            class="marcabold-footer__logo"
+            src="{{ logo_asset | asset_url }}"
+            alt="{{ shop.name | escape }}"
+            width="250"
+            height="64"
+            loading="lazy"
+          >
+        {% endif %}
+      </a>
+
+      {% if section.settings.copyright_text != blank %}
+        <p class="marcabold-footer__copyright">{{ section.settings.copyright_text | escape }}</p>
+      {% endif %}
+
+      {% if section.settings.powered_text != blank %}
+        <p class="marcabold-footer__powered">{{ section.settings.powered_text | escape }}</p>
+      {% endif %}
+    </div>
+  </div>
+</footer>
+
+{% stylesheet %}
+  .marcabold-footer {
+    display: block;
+    padding: var(--mf-padding-top) var(--mf-side-padding) var(--mf-padding-bottom);
+    background: var(--mf-bg);
+    color: var(--mf-text);
+    font-family: Overpass, Inter, var(--font-body--family), sans-serif;
+  }
+
+  .marcabold-footer__inner {
+    width: min(var(--mf-max-width), 100%);
+    margin-inline: auto;
+  }
+
+  .marcabold-footer__newsletter,
+  .marcabold-footer__links-panel {
+    background: var(--mf-card-bg);
+  }
+
+  .marcabold-footer__newsletter {
+    display: grid;
+    min-height: 124px;
+    grid-template-columns: minmax(0, 680px) minmax(0, calc(var(--mf-input-width) + var(--mf-button-width) + 28px));
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    padding: 26px 28px 21px 34px;
+    border-radius: 14px;
+  }
+
+  .marcabold-footer__newsletter-copy,
+  .marcabold-footer__eyebrow,
+  .marcabold-footer__heading,
+  .marcabold-footer__text,
+  .marcabold-footer__column-heading,
+  .marcabold-footer__menu,
+  .marcabold-footer__copyright,
+  .marcabold-footer__powered,
+  .marcabold-footer__form-message {
+    margin: 0;
+  }
+
+  .marcabold-footer__eyebrow {
+    color: var(--mf-text);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 12px;
+    text-transform: uppercase;
+  }
+
+  .marcabold-footer__heading {
+    margin-top: 8px;
+    color: var(--mf-text);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 32px;
+    letter-spacing: 0;
+  }
+
+  .marcabold-footer__text {
+    margin-top: 5px;
+    color: var(--mf-muted);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0;
+  }
+
+  .marcabold-footer__form {
+    display: grid;
+    grid-template-columns: minmax(0, var(--mf-input-width)) var(--mf-button-width);
+    align-items: start;
+    gap: 28px;
+  }
+
+  .marcabold-footer__input,
+  .marcabold-footer__submit {
+    width: 100%;
+    height: 42px;
+    border-radius: 21px;
+    font-family: Overpass, Inter, var(--font-body--family), sans-serif;
+    letter-spacing: 0;
+  }
+
+  .marcabold-footer__input {
+    border: 1px solid #dbdbdb;
+    background: #ffffff;
+    color: var(--mf-text);
+    padding: 0 29px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+  }
+
+  .marcabold-footer__input::placeholder {
+    color: var(--mf-muted);
+    opacity: 1;
+  }
+
+  .marcabold-footer__submit {
+    border: 0;
+    background: #0b0b0b;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 13px;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .marcabold-footer__form-message {
+    grid-column: 1 / -1;
+    color: var(--mf-muted);
+    font-size: 11px;
+    line-height: 15px;
+  }
+
+  .marcabold-footer__form-message--error,
+  .marcabold-footer__form-message--error a {
+    color: #b00020;
+  }
+
+  .marcabold-footer__links-panel {
+    position: relative;
+    min-height: 350px;
+    margin-top: var(--mf-panel-gap);
+    padding: 56px 42px 58px;
+    border-radius: 16px;
+  }
+
+  .marcabold-footer__columns {
+    display: grid;
+    grid-template-columns: repeat(3, 220px);
+    column-gap: 44px;
+  }
+
+  .marcabold-footer__column:nth-child(3) {
+    margin-left: 20px;
+  }
+
+  .marcabold-footer__column-heading {
+    color: var(--mf-text);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 14px;
+    letter-spacing: 0;
+  }
+
+  .marcabold-footer__menu {
+    display: grid;
+    gap: 9px;
+    margin-top: 21px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .marcabold-footer__menu a {
+    color: var(--mf-muted);
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 15px;
+    text-decoration: none;
+  }
+
+  .marcabold-footer__menu a:hover {
+    color: var(--mf-text);
+  }
+
+  .marcabold-footer__logo-link {
+    position: absolute;
+    top: 145px;
+    right: 96px;
+    display: block;
+    width: var(--mf-logo-width);
+    text-decoration: none;
+  }
+
+  .marcabold-footer__logo {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .marcabold-footer__copyright,
+  .marcabold-footer__powered {
+    position: absolute;
+    bottom: 36px;
+    letter-spacing: 0;
+  }
+
+  .marcabold-footer__copyright {
+    left: 42px;
+    color: var(--mf-text);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 12px;
+    text-transform: uppercase;
+  }
+
+  .marcabold-footer__powered {
+    right: 116px;
+    color: var(--mf-muted);
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 14px;
+    white-space: pre;
+  }
+
+  @media screen and (max-width: 989px) {
+    .marcabold-footer__newsletter {
+      grid-template-columns: 1fr;
+      align-items: start;
+      gap: 22px;
+    }
+
+    .marcabold-footer__form {
+      grid-template-columns: minmax(0, 1fr) minmax(140px, 180px);
+    }
+
+    .marcabold-footer__links-panel {
+      padding-bottom: 116px;
+    }
+
+    .marcabold-footer__columns {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 28px;
+    }
+
+    .marcabold-footer__column:nth-child(3) {
+      margin-left: 0;
+    }
+
+    .marcabold-footer__logo-link {
+      right: 42px;
+      width: min(var(--mf-logo-width), 220px);
+    }
+
+    .marcabold-footer__powered {
+      right: 42px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .marcabold-footer {
+      padding: 24px 12px 28px;
+    }
+
+    .marcabold-footer__newsletter {
+      min-height: auto;
+      padding: 24px 18px;
+      border-radius: 12px;
+    }
+
+    .marcabold-footer__heading {
+      font-size: 22px;
+      line-height: 28px;
+    }
+
+    .marcabold-footer__text {
+      font-size: 12px;
+      line-height: 17px;
+    }
+
+    .marcabold-footer__form {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .marcabold-footer__links-panel {
+      min-height: auto;
+      margin-top: 20px;
+      padding: 28px 18px 24px;
+      border-radius: 12px;
+    }
+
+    .marcabold-footer__columns {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .marcabold-footer__menu {
+      margin-top: 14px;
+    }
+
+    .marcabold-footer__logo-link,
+    .marcabold-footer__copyright,
+    .marcabold-footer__powered {
+      position: static;
+    }
+
+    .marcabold-footer__logo-link {
+      width: min(var(--mf-logo-width), 210px);
+      margin-top: 34px;
+    }
+
+    .marcabold-footer__copyright {
+      margin-top: 34px;
+    }
+
+    .marcabold-footer__powered {
+      margin-top: 16px;
+      white-space: normal;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Marcabold footer",
+  "tag": "section",
+  "class": "marcabold-footer-section",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show newsletter",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_eyebrow",
+      "label": "Newsletter eyebrow",
+      "default": "MARCA BOLD CLUB"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Newsletter heading",
+      "default": "Get first access to new drops"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_text",
+      "label": "Newsletter text",
+      "default": "Style notes, size-inclusive edits, and member-only offers straight to your inbox."
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "Enter your email"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "SUBSCRIBE"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thanks for subscribing."
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "text",
+      "id": "logo_fallback_asset",
+      "label": "Logo fallback asset",
+      "default": "marcabold-logo.png"
+    },
+    {
+      "type": "url",
+      "id": "logo_link",
+      "label": "Logo link"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright",
+      "default": "© 2026 MARCA BOLD. ALL RIGHTS RESERVED"
+    },
+    {
+      "type": "text",
+      "id": "powered_text",
+      "label": "Powered text",
+      "default": "Powered By   GreenHonchos"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Max width",
+      "min": 1000,
+      "max": 1600,
+      "step": 10,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "label": "Side padding",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "panel_gap",
+      "label": "Panel gap",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "input_width",
+      "label": "Email width",
+      "min": 240,
+      "max": 420,
+      "step": 10,
+      "unit": "px",
+      "default": 360
+    },
+    {
+      "type": "range",
+      "id": "button_width",
+      "label": "Button width",
+      "min": 120,
+      "max": 240,
+      "step": 10,
+      "unit": "px",
+      "default": 180
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "Logo width",
+      "min": 120,
+      "max": 320,
+      "step": 5,
+      "unit": "px",
+      "default": 250
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ececec"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#0b0b0b"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Muted text",
+      "default": "#575757"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu_column",
+      "name": "Menu column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Menu heading"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        },
+        {
+          "type": "text",
+          "id": "link_1_label",
+          "label": "Link 1 label"
+        },
+        {
+          "type": "url",
+          "id": "link_1_url",
+          "label": "Link 1 URL"
+        },
+        {
+          "type": "text",
+          "id": "link_2_label",
+          "label": "Link 2 label"
+        },
+        {
+          "type": "url",
+          "id": "link_2_url",
+          "label": "Link 2 URL"
+        },
+        {
+          "type": "text",
+          "id": "link_3_label",
+          "label": "Link 3 label"
+        },
+        {
+          "type": "url",
+          "id": "link_3_url",
+          "label": "Link 3 URL"
+        },
+        {
+          "type": "text",
+          "id": "link_4_label",
+          "label": "Link 4 label"
+        },
+        {
+          "type": "url",
+          "id": "link_4_url",
+          "label": "Link 4 URL"
+        },
+        {
+          "type": "text",
+          "id": "link_5_label",
+          "label": "Link 5 label"
+        },
+        {
+          "type": "url",
+          "id": "link_5_url",
+          "label": "Link 5 URL"
+        },
+        {
+          "type": "text",
+          "id": "link_6_label",
+          "label": "Link 6 label"
+        },
+        {
+          "type": "url",
+          "id": "link_6_url",
+          "label": "Link 6 URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marcabold footer",
+      "blocks": [
+        {
+          "type": "menu_column",
+          "settings": {
+            "heading": "Connect with us",
+            "link_1_label": "Call",
+            "link_2_label": "Text (WhatsApp)",
+            "link_3_label": "Instagram",
+            "link_4_label": "YouTube",
+            "link_5_label": "LinkedIn"
+          }
+        },
+        {
+          "type": "menu_column",
+          "settings": {
+            "heading": "Order Support",
+            "link_1_label": "Return/Exchange",
+            "link_2_label": "Refund/Exchange policy",
+            "link_3_label": "Track your order",
+            "link_4_label": "Shipping policy",
+            "link_5_label": "FAQ's",
+            "link_6_label": "Terms"
+          }
+        },
+        {
+          "type": "menu_column",
+          "settings": {
+            "heading": "We are MARCA BOLD",
+            "link_1_label": "Our story",
+            "link_2_label": "Fit guide",
+            "link_3_label": "Collaborations",
+            "link_4_label": "Media",
+            "link_5_label": "Blogs"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
